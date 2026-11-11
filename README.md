@@ -1,11 +1,11 @@
 # MustardOS_RemoteAI
 
-**Use a MustardOS (muOS) handheld as a pocket terminal for AI coding agents running on your Windows PC.**
+**Answer your AI coding agent from the sofa.** Claude Code (or agy) keeps working on your Windows PC; when it
+asks a question, you reply from a muOS handheld – in the same session that is open on the PC.
 
-Claude Code, agy and similar CLI agents work for minutes at a time and only now and then need an answer or
-a decision from you. MustardOS_RemoteAI lets you do that from the sofa: grab the handheld (e.g. an Anbernic
-RG35XX H with a Bluetooth keyboard), open an app, pick a running session and talk to the agent – the same
-session that is open on the PC. You can also start new sessions in any project folder from the console.
+- Pick a running session on the handheld, type, detach with F8 – the agent keeps running.
+- Start new sessions in any project folder right from the handheld.
+- Tested on an Anbernic RG35XX H with a mini Bluetooth keyboard.
 
 Author: Patryk Strzelecki
 
@@ -38,9 +38,6 @@ Real screenshots taken on an Anbernic RG35XX H (640×480, muOS); paths and priva
 | ![Session menu](docs/screenshots/01-session-menu.png) | ![Directory browser](docs/screenshots/03-directory-browser.png) |
 | **Claude Code running on the PC, shown on the console** | **Connect to PowerShell** |
 | ![Claude Code](docs/screenshots/04-claude-code-on-console.png) | ![PowerShell](docs/screenshots/05-powershell.png) |
-
-<sub>Below: a simulated screen (not a capture) rendered with the console's terminal font at its 91×30 grid,
-with a sample conversation – shows what a chat with the agent looks like on the handheld.</sub>
 
 ![Simulated chat with Claude Code on the console](docs/screenshots/06-simulated-ai-chat.png)
 
