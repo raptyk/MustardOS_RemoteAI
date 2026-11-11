@@ -33,7 +33,12 @@ CONSOLE_APP_DIR/Connect to Claude-Agy/mux_launch.sh
    Runs directly (no psmux) for: `AI_PASSTHRU_ARGS`, subcommands, `--no-mux`, or when already inside psmux.
    Exiting the tool = session ends; closing the window = detach only (the tool keeps running).
 4. **Console, Connect to Claude/Agy** – SSH with the console key to `LAPTOP_USER@LAPTOP_HOST`; sshd starts `pwsh` with the session menu.
-   - Attach: `psmux attach` to the chosen session (the same one the PC sees). Window size follows the device used last.
+   - The menu redraws itself every 3 s when the psmux session list changes (only while nothing is typed), so a session
+     started on the PC appears without restarting the app.
+   - Attach: `psmux attach` to the chosen session (the same one the PC sees). `window-size smallest`: while the console
+     is attached the window has the console size (91×30), so lines wrap for its screen; the PC window shows the same area.
+   - Detach: **F8** or **F12** (`bind-key -n … detach-client`). The console terminal (muxterm) does not pass `Ctrl+b`
+     from a Bluetooth keyboard, so the tmux prefix cannot be used there.
    - New: tool + directory chosen in the menu → request written to `laptop\.session_request` → scheduled task started →
      `start-session.ps1` creates the session in the interactive logon → menu waits (`SESSION_START_TIMEOUT`) and attaches.
      If the task is missing or does not respond, the session is started in the SSH logon instead (agy will not be signed in).
@@ -82,6 +87,8 @@ Alternatives considered and rejected:
 - **Firewall:** rule `OpenSSH-Server-In-TCP`, Private profile, only from `CONSOLE_HOST`. Key-only login is the real protection.
 
 ## Gotchas (verified)
+- **`window-size latest` cut lines on the console** – the PC terminal sends focus/mouse events, which made the PC the
+  "latest" client again and resized the window back to its width. Hence `smallest`.
 - **SSH key logon = no Credential Manager** (see above) – applies to anything storing secrets there.
 - **`agy-switch-accounts`** calls `agy --print ...` – passes through `ai-mux.ps1` unchanged (no psmux).
 - **Several installs of one CLI** (e.g. Claude Code via npm/nvm and the native `~\.local\bin\claude.exe`) – the one in
