@@ -29,15 +29,20 @@ Handheld (muOS)                                  Windows PC
 Details: [docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md).
 
 ## Screenshots
+![RG35XX H with a mini Bluetooth keyboard, Claude Code session on screen](docs/screenshots/00-device.jpg)
+
 Real screenshots taken on an Anbernic RG35XX H (640×480, muOS); paths and private names are blurred.
 
-| Session menu | New session – pick a tool |
+| Session menu | Directory browser |
 |---|---|
-| ![Session menu](docs/screenshots/01-session-menu.png) | ![Tool choice](docs/screenshots/02-new-session-tool.png) |
-| **Directory browser** | **Claude Code running on the PC, shown on the console** |
-| ![Directory browser](docs/screenshots/03-directory-browser.png) | ![Claude Code](docs/screenshots/04-claude-code-on-console.png) |
-| **Connect to PowerShell** | |
-| ![PowerShell](docs/screenshots/05-powershell.png) | |
+| ![Session menu](docs/screenshots/01-session-menu.png) | ![Directory browser](docs/screenshots/03-directory-browser.png) |
+| **Claude Code running on the PC, shown on the console** | **Connect to PowerShell** |
+| ![Claude Code](docs/screenshots/04-claude-code-on-console.png) | ![PowerShell](docs/screenshots/05-powershell.png) |
+
+<sub>Below: a simulated screen (not a capture) rendered with the console's terminal font at its 91×30 grid,
+with a sample conversation – shows what a chat with the agent looks like on the handheld.</sub>
+
+![Simulated chat with Claude Code on the console](docs/screenshots/06-simulated-ai-chat.png)
 
 ## Installation
 Requirements: Windows 10/11 with PowerShell 7 and the AI CLIs you use; a muOS console with SSH enabled
