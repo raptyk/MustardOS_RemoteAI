@@ -53,7 +53,10 @@ The file is read by PowerShell on the PC. The console gets a generated copy with
 - **Connect to Claude/Agy** – session menu:
   - list shows all sessions tagged with the tool (`[claude]`, `[agy]`, …, `[other]`); `number` = attach;
   - `n` = new session → pick the tool (keys from the config, Enter = the first one) → pick the directory;
-  - `s` = PowerShell, `q` = quit. Inside a session: `Ctrl+b`, then `d` = detach (the tool keeps running).
+  - `s` = PowerShell, `q` = quit, Enter = refresh. The list also refreshes by itself every 3 s while nothing is typed,
+    so a session started on the PC appears without restarting the app.
+  - Inside a session: `Ctrl+b`, then `d` = detach (the tool keeps running). The psmux status bar at the bottom shows
+    `[session name]`, a detach hint and the time (`laptop\psmux.conf`).
 - **Directory browser** (starts in `PROJECTS_ROOT`): `number` = open subfolder, **Enter = start here**, `..` = up,
   any text = filter by name (a single match opens automatically), `/` = clear filter, `+`/`-` = page,
   `l` = last used directory, `q` = cancel.
@@ -69,6 +72,8 @@ One-shot calls (`-p`, `--print`, `--version`, subcommands like `update`) run dir
 - **A tool says "not signed in" in a session started from the console** (agy) – nobody is logged in on the PC
   (e.g. after a reboot), or the scheduled task `MustardOS_RemoteAI Start Session` is missing (`install.ps1 -Steps laptop`).
   See [HOW-IT-WORKS.md](HOW-IT-WORKS.md) → "Why a scheduled task".
+- **"(no sessions)" although Claude is open on the PC** – that window runs outside psmux: one-shot calls and subcommands
+  (`claude login`, `claude update`, `--no-mux`) are not wrapped. Close it and start plain `claude`; it shows up within 3 s.
 - **Console IP changed** – update `CONSOLE_HOST`, run `install.ps1 -Steps sshd` (firewall rule).
 - **App names/icons not refreshed on the console** – leave Applications and enter again, or reboot the console.
 - **After a muOS reinstall** – files on SD2 survive; if `CONSOLE_APP_DIR` is gone, run `install.ps1 -Steps console`.

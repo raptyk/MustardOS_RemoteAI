@@ -80,9 +80,40 @@ function Select-Tool {
     return $null
 }
 
+# Session list as one string - compared to detect changes while the menu waits for input.
+function Get-SessionSnapshot {
+    return ((psmux ls -F '#{session_name}|#{session_attached}|#{pane_current_path}' 2>$null | Where-Object { $_ }) -join "`n")
+}
+
+# Like Read-Host '>', but returns $null (= redraw the menu) when the session list changes while nothing is typed,
+# so a session started on the laptop shows up on the console without pressing anything.
+function Read-MenuChoice([string]$Snapshot) {
+    try { $null = [Console]::KeyAvailable } catch { return (Read-Host '>') }   # no console (redirected input)
+    Write-Host -NoNewline '>: '
+    $buf = ''; $next = (Get-Date).AddSeconds($RefreshSeconds)
+    while ($true) {
+        if ([Console]::KeyAvailable) {
+            $k = [Console]::ReadKey($true)
+            if ($k.Key -eq 'Enter') { Write-Host ''; return $buf }
+            if ($k.Key -eq 'Backspace') {
+                if ($buf.Length -gt 0) { $buf = $buf.Substring(0, $buf.Length - 1); Write-Host -NoNewline "`b `b" }
+            }
+            elseif ($k.KeyChar -and -not [char]::IsControl($k.KeyChar)) { $buf += $k.KeyChar; Write-Host -NoNewline $k.KeyChar }
+            continue
+        }
+        if ($buf -eq '' -and (Get-Date) -ge $next) {
+            if ((Get-SessionSnapshot) -ne $Snapshot) { return $null }
+            $next = (Get-Date).AddSeconds($RefreshSeconds)
+        }
+        Start-Sleep -Milliseconds 100
+    }
+}
+$RefreshSeconds = 3
+
 while ($true) {
     Clear-Host
-    $rows = @(psmux ls -F '#{session_name}|#{session_attached}|#{pane_current_path}' 2>$null |
+    $snapshot = Get-SessionSnapshot
+    $rows = @($snapshot -split "`n" |
         Where-Object { $_ } | ForEach-Object {
             $p = $_ -split '\|', 3
             [pscustomobject]@{ Name = $p[0]; Att = [int]$p[1]; Dir = $p[2]; Tag = Get-Tag $p[0] }
@@ -97,9 +128,12 @@ while ($true) {
         Write-Host ("      {0}" -f $r.Dir) -ForegroundColor DarkGray
     }
     Write-Host ''
-    Write-Host ' nr = attach   n = new session   s = PowerShell   q = quit'
+    Write-Host ' nr = attach   n = new session   s = PowerShell   Enter = refresh   q = quit'
     Write-Host ' Detach from a session: Ctrl+b, then d   (* = also open elsewhere)' -ForegroundColor DarkGray
-    $c = (Read-Host '>').Trim()
+    Write-Host (' The list refreshes by itself every {0} s.' -f $RefreshSeconds) -ForegroundColor DarkGray
+    $c = Read-MenuChoice $snapshot
+    if ($null -eq $c) { continue }
+    $c = $c.Trim()
 
     if ($c -match '^\d+$' -and [int]$c -ge 1 -and [int]$c -le $rows.Count) {
         psmux attach -t $rows[[int]$c - 1].Name
