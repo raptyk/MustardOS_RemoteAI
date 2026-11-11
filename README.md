@@ -28,6 +28,17 @@ Handheld (muOS)                                  Windows PC
 
 Details: [docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md).
 
+## Screenshots
+Real screenshots taken on an Anbernic RG35XX H (640×480, muOS); paths and private names are blurred.
+
+| Session menu | New session – pick a tool |
+|---|---|
+| ![Session menu](docs/screenshots/01-session-menu.png) | ![Tool choice](docs/screenshots/02-new-session-tool.png) |
+| **Directory browser** | **Claude Code running on the PC, shown on the console** |
+| ![Directory browser](docs/screenshots/03-directory-browser.png) | ![Claude Code](docs/screenshots/04-claude-code-on-console.png) |
+| **Connect to PowerShell** | |
+| ![PowerShell](docs/screenshots/05-powershell.png) | |
+
 ## Installation
 Requirements: Windows 10/11 with PowerShell 7 and the AI CLIs you use; a muOS console with SSH enabled
 (default `root`/`root`) on the same network. The installer adds psmux (winget) and Windows OpenSSH Server.
