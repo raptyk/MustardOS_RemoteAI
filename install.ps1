@@ -209,7 +209,8 @@ function Install-Console {
     Write-Host "Console public key: $pub"
 
     # 3. Console key -> config (used by the sshd step)
-    if ($pub -match '^ssh-' -and $pub.Trim() -ne $cfg.CONSOLE_PUBKEY.Trim()) {
+    $keyOnly = { param($k) (("$k".Trim() -split '\s+') | Select-Object -First 2) -join ' ' }   # ignore the key comment
+    if ($pub -match '^ssh-' -and (& $keyOnly $pub) -ne (& $keyOnly $cfg.CONSOLE_PUBKEY)) {
         if ($cfg.CONSOLE_PUBKEY) {
             Write-Warning 'The console key differs from CONSOLE_PUBKEY - updating the config; run: install.ps1 -Steps sshd'
         }
