@@ -87,6 +87,14 @@ Alternatives considered and rejected:
 - **Firewall:** rule `OpenSSH-Server-In-TCP`, Private profile, only from `CONSOLE_HOST`. Key-only login is the real protection.
 
 ## Gotchas (verified)
+- **Physical PgUp/PgDn never reach the program** – muxterm uses them to scroll its own scrollback
+  (MustardOS/frontend `terminal/input.c`), which is empty inside psmux. `console/mustardos_remoteai/kbd-proxy.py`
+  (started by the apps' `mux_launch.sh` before muxterm, stopped with the app) grabs external keyboards exclusively and
+  re-emits all keys through a virtual keyboard, PgUp → F9, PgDn → F10; `psmux.conf` maps F9/F10 back to PgUp/PgDn.
+  Log: `/tmp/mustardos-remoteai-kbd.log` on the console. A key logger confirmed the Rii mini keyboard sends real
+  `KEY_PAGEUP`/`KEY_PAGEDOWN` for Fn+↑/↓.
+- **Mouse/touchpad in the terminal** – the keyboard reports the touchpad on the same input device (REL_X/Y, wheel,
+  buttons), but muxterm has no mouse support at all, so it is ignored there (it works in DOSBox via RetroArch).
 - **`window-size latest` cut lines on the console** – the PC terminal sends focus/mouse events, which made the PC the
   "latest" client again and resized the window back to its width. Hence `smallest`.
 - **SSH key logon = no Credential Manager** (see above) – applies to anything storing secrets there.

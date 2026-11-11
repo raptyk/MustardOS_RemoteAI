@@ -58,6 +58,9 @@ The file is read by PowerShell on the PC. The console gets a generated copy with
   - Inside a session: **F8** (or **F12**) = detach (the tool keeps running); `Ctrl+b`, then `d` works too on the PC, but the console
     terminal does not pass `Ctrl+b` from a Bluetooth keyboard. The psmux status bar at the bottom shows `[session name]`,
     the detach hint and the time (`laptop\psmux.conf`).
+  - **PgUp / PgDn** (on mini keyboards: Fn+↑ / Fn+↓) scroll in the session (e.g. Claude Code's transcript). The muOS
+    terminal keeps these keys for itself, so a small keyboard proxy on the console passes them on as F9/F10 and psmux turns
+    them back into PgUp/PgDn – nothing to configure. In **Connect to PowerShell** (no psmux) they arrive as F9/F10.
   - While the console is attached, the session is sized to the console screen (`window-size smallest`), so lines wrap
     correctly there; the PC window shows the same smaller area until the console detaches.
 - **Directory browser** (starts in `PROJECTS_ROOT`): `number` = open subfolder, **Enter = start here**, `..` = up,
@@ -98,7 +101,7 @@ One-shot calls (`-p`, `--print`, `--version`, subcommands like `update`) run dir
 | `laptop\register-start-task.ps1` | registers that scheduled task |
 | `laptop\setup-sshd.ps1` | configures OpenSSH Server (admin) |
 | `laptop\psmux.conf` | installed as `~\.psmux.conf` |
-| `console\mustardos_remoteai\` | → `CONSOLE_BASE_DIR`: `ssh-laptop.sh`, `dropbearmulti` (static Dropbear 2025.88 client, aarch64, see `DROPBEAR-LICENSE`), `test-connect-ai-app.py` |
+| `console\mustardos_remoteai\` | → `CONSOLE_BASE_DIR`: `ssh-laptop.sh`, `dropbearmulti` (static Dropbear 2025.88 client, aarch64, see `DROPBEAR-LICENSE`), `kbd-proxy.py` (PgUp/PgDn → F9/F10), `test-connect-ai-app.py` |
 | `console\application\` | → `CONSOLE_APP_DIR`: the two muOS apps (`mux_launch.sh`, `mux_lang.ini`, wrapper script, icon) |
 
 Runtime files (git-ignored): `laptop\.last_dir`, `laptop\.session_request`, `laptop\*.log`.
