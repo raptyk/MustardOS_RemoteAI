@@ -129,7 +129,7 @@ while ($true) {
     }
     Write-Host ''
     Write-Host ' nr = attach   n = new session   s = PowerShell   Enter = refresh   q = quit'
-    Write-Host ' Detach from a session: Ctrl+b, then d   (* = also open elsewhere)' -ForegroundColor DarkGray
+    Write-Host ' Detach from a session: F12 (or Ctrl+b, then d)   (* = also open elsewhere)' -ForegroundColor DarkGray
     Write-Host (' The list refreshes by itself every {0} s.' -f $RefreshSeconds) -ForegroundColor DarkGray
     $c = Read-MenuChoice $snapshot
     if ($null -eq $c) { continue }
