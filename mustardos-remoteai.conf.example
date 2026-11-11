@@ -1,0 +1,57 @@
+# MustardOS_RemoteAI configuration - EXAMPLE.
+#
+#   1. Copy this file to "mustardos-remoteai.conf" (same folder) and fill in your values.
+#   2. Run install.ps1 (see README.md). Re-run "install.ps1 -Steps console" after every change
+#      that concerns the console (LAPTOP_*, CONSOLE_*_DIR).
+#
+# mustardos-remoteai.conf is listed in .gitignore - it holds addresses, user names, passwords and keys,
+# so it must never be committed. Only this .example file belongs in the repository.
+#
+# Format: KEY='value', one per line, "#" starts a comment. Use single quotes (Windows paths contain "\").
+# The same file is read by PowerShell (laptop) and by sh (console), so keep it that simple:
+# no spaces around "=", no variables. %VAR% (Windows environment variables) is expanded on the laptop.
+# Missing keys fall back to the defaults shown here.
+
+# ---------------------------------------------------------------------------------------------
+# Laptop / PC (Windows) - runs sshd, psmux and the AI tools
+# ---------------------------------------------------------------------------------------------
+LAPTOP_HOST='192.168.1.20'          # IP or host name the console connects to (reserve it in the router)
+LAPTOP_USER='your-windows-user'     # Windows account the console logs in as (the only one allowed by sshd)
+LAPTOP_SSH_PORT='22'
+PROJECTS_ROOT='C:\Projects'         # starting folder of the directory browser ("new session")
+PWSH_EXE='C:\Program Files\PowerShell\7\pwsh.exe'
+
+# ---------------------------------------------------------------------------------------------
+# AI tools started inside psmux (session name: <command>-<directory>)
+#   AI_TOOL_<command>='<menu key>|<display name>|<executable>'
+#   <command>    - name typed on the laptop (claude, agy, ...), letters/digits/_ only
+#   <menu key>   - key used in the console menu to pick the tool; the first tool is the default
+#   <executable> - optional; if empty or missing, the first "<command>" found in PATH is used
+# Remove or add lines freely - every tool listed here works on the laptop and in the console menu.
+# ---------------------------------------------------------------------------------------------
+AI_TOOL_claude='c|Claude Code|%USERPROFILE%\.local\bin\claude.exe'
+AI_TOOL_agy='a|agy|%LOCALAPPDATA%\agy\bin\agy.exe'
+# AI_TOOL_codex='x|Codex|'
+
+# Arguments that mean "one-shot / informational": the tool then runs directly, without psmux.
+AI_PASSTHRU_ARGS='-p --print --prompt -v --version -h --help'
+
+# ---------------------------------------------------------------------------------------------
+# Console (muOS handheld, e.g. Anbernic RG35XX H)
+# ---------------------------------------------------------------------------------------------
+CONSOLE_HOST='192.168.1.30'         # used by setup-sshd (firewall rule) and by the installer (file upload)
+CONSOLE_USER='root'                 # console SSH login (muOS default: root/root)
+CONSOLE_PASSWORD='root'             # used ONLY by the installer on the laptop; never copied to the console
+                                    # empty = ask every time
+CONSOLE_SSH_PORT='22'
+CONSOLE_PUBKEY=''                   # console public key ("ssh-ed25519 AAAA... name") allowed to log in to the laptop.
+                                    # Empty = the installer generates a key on the console and writes it here.
+CONSOLE_BASE_DIR='/mnt/sdcard/mustardos_remoteai'      # SSH client, key, console copy of the settings (SD2 survives muOS reinstalls)
+CONSOLE_APP_DIR='/mnt/sdcard/MUOS/application'  # muOS applications folder (SD2); SD1 would be /mnt/mmc/MUOS/application
+
+# ---------------------------------------------------------------------------------------------
+# Misc
+# ---------------------------------------------------------------------------------------------
+BROWSER_PAGE_SIZE='12'              # directory browser: entries per page (console screen = ~24 lines)
+SESSION_START_TIMEOUT='20'          # seconds the console menu waits for a new session to appear
+PSMUX_NO_WARM='1'                   # 1 = psmux does not pre-spawn spare shells (~165 MB RAM each)
