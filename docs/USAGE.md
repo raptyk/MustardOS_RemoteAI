@@ -55,7 +55,7 @@ The file is read by PowerShell on the PC. The console gets a generated copy with
   - `n` = new session → pick the tool (keys from the config, Enter = the first one) → pick the directory;
   - `s` = PowerShell, `q` = quit, Enter = refresh. The list also refreshes by itself every 3 s while nothing is typed,
     so a session started on the PC appears without restarting the app.
-  - Inside a session: **F12** = detach (the tool keeps running); `Ctrl+b`, then `d` works too on the PC, but the console
+  - Inside a session: **F8** (or **F12**) = detach (the tool keeps running); `Ctrl+b`, then `d` works too on the PC, but the console
     terminal does not pass `Ctrl+b` from a Bluetooth keyboard. The psmux status bar at the bottom shows `[session name]`,
     the detach hint and the time (`laptop\psmux.conf`).
   - While the console is attached, the session is sized to the console screen (`window-size smallest`), so lines wrap
