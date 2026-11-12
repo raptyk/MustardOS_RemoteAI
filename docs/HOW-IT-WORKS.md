@@ -93,6 +93,12 @@ Alternatives considered and rejected:
   re-emits all keys through a virtual keyboard, PgUp → F9, PgDn → F10; `psmux.conf` maps F9/F10 back to PgUp/PgDn.
   Log: `/tmp/mustardos-remoteai-kbd.log` on the console. A key logger confirmed the Rii mini keyboard sends real
   `KEY_PAGEUP`/`KEY_PAGEDOWN` for Fn+↑/↓.
+- **Italic text was barely readable** – Claude Code prints some lines in italic (SGR 3, e.g. the recap). muxterm has
+  no italic font, so SDL_ttf slants the regular glyphs. `console/mustardos_remoteai/muxterm-italic.sh` (run by the apps'
+  `mux_launch.sh`) sets `term_font_path_italic` / `term_font_path_bold_italic` in the app's muxterm config
+  (`/opt/muos/share/info/config/Terminal/Connect*.conf`) to `fonts/JetBrainsMono-MediumItalic.ttf` (OFL, the italic
+  of muOS's terminal font); with an explicit font file muxterm skips the synthetic slant. Colour is not an option:
+  muxterm draws all text in one colour (`fg_colour`).
 - **Mouse/touchpad in the terminal** – the keyboard reports the touchpad on the same input device (REL_X/Y, wheel,
   buttons), but muxterm has no mouse support at all, so it is ignored there (it works in DOSBox via RetroArch).
 - **`window-size latest` cut lines on the console** – the PC terminal sends focus/mouse events, which made the PC the

@@ -2,3 +2,4 @@
 * text=auto eol=lf
 console/mustardos_remoteai/dropbearmulti binary
 *.svg text eol=lf
+*.ttf binary

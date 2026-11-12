@@ -26,6 +26,9 @@ if command -v python3 >/dev/null && [ -f "$BASE_DIR/kbd-proxy.py" ]; then
     sleep 0.5
 fi
 
+# Italic text (e.g. Claude Code "recap" lines) in a real italic font: the synthetic slant is barely readable here.
+[ -f "$BASE_DIR/muxterm-italic.sh" ] && sh "$BASE_DIR/muxterm-italic.sh" "$TERM_CFG_DIR/ConnectAI.conf"
+
 /opt/muos/frontend/muxterm --gl -c "$TERM_CFG_DIR/ConnectAI.conf" -- "$APP_DIR/session-menu.sh"
 
 [ -n "$KBD_PROXY" ] && kill "$KBD_PROXY" 2>/dev/null
