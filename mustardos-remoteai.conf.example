@@ -52,6 +52,7 @@ CONSOLE_APP_DIR='/mnt/sdcard/MUOS/application'  # muOS applications folder (SD2)
 # ---------------------------------------------------------------------------------------------
 # Misc
 # ---------------------------------------------------------------------------------------------
-BROWSER_PAGE_SIZE='12'              # directory browser: entries per page (console screen = ~24 lines)
+BROWSER_MIN_NAME_WIDTH='20'         # directory browser: names shown in columns, no paging; fewer columns rather than
+                                    # names shorter than this (longer names end with ...)
 SESSION_START_TIMEOUT='20'          # seconds the console menu waits for a new session to appear
 PSMUX_NO_WARM='1'                   # 1 = psmux does not pre-spawn spare shells (~165 MB RAM each)

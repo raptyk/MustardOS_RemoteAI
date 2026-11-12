@@ -43,7 +43,7 @@ One file for everything, see the comments in [`mustardos-remoteai.conf.example`]
 | `CONSOLE_HOST`, `CONSOLE_USER`, `CONSOLE_PASSWORD`, `CONSOLE_SSH_PORT` | console login, used only by the installer |
 | `CONSOLE_PUBKEY` | console public key allowed to log in to the PC (filled in by the installer) |
 | `CONSOLE_BASE_DIR`, `CONSOLE_APP_DIR` | where the files go on the console |
-| `BROWSER_PAGE_SIZE`, `SESSION_START_TIMEOUT`, `PSMUX_NO_WARM` | tuning |
+| `BROWSER_MIN_NAME_WIDTH`, `SESSION_START_TIMEOUT`, `PSMUX_NO_WARM` | tuning |
 
 The file is read by PowerShell on the PC. The console gets a generated copy with only the keys it needs
 (`CONSOLE_BASE_DIR/mustardos-remoteai.conf`, no passwords). Another location: set `$env:MUSTARDOS_REMOTEAI_CONFIG`.
@@ -64,8 +64,9 @@ The file is read by PowerShell on the PC. The console gets a generated copy with
   - While the console is attached, the session is sized to the console screen (`window-size smallest`), so lines wrap
     correctly there; the PC window shows the same smaller area until the console detaches.
 - **Directory browser** (starts in `PROJECTS_ROOT`): `number` = open subfolder, **Enter = start here**, `..` = up,
-  any text = filter by name (a single match opens automatically), `/` = clear filter, `+`/`-` = page,
-  `l` = last used directory, `q` = cancel.
+  any text = filter by name (a single match opens automatically), `/` = clear filter,
+  `l` = last used directory, `q` = cancel. Folders are listed in columns fitted to the screen width (no paging;
+  scroll if they do not fit), long names end with `...`.
 - **Connect to PowerShell** – straight into PowerShell 7 on the PC.
 
 **PC:** type `claude`, `agy` (or any configured tool) as usual – it starts inside psmux automatically

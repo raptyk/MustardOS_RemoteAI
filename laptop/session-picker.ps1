@@ -3,7 +3,7 @@
 # Lists psmux sessions (AI tools from mustardos-remoteai.conf and others), attaches to them or starts new ones.
 . (Join-Path $PSScriptRoot 'ai-mux.ps1')
 $Tools = $RemoteAI.Tools
-$PageSize = $RemoteAI.PageSize
+$MinNameWidth = $RemoteAI.MinNameWidth
 $lastDirFile = $RemoteAI.LastDirFile
 
 function Get-Tag([string]$name) {
@@ -11,26 +11,69 @@ function Get-Tag([string]$name) {
     return 'other'
 }
 
+# Terminal width in characters (over SSH: the console's muxterm size, e.g. 91); fallback 80.
+function Get-TermWidth {
+    try { $w = $Host.UI.RawUI.WindowSize.Width; if ($w -ge 20) { return $w } } catch { }
+    try { $w = [Console]::WindowWidth; if ($w -ge 20) { return $w } } catch { }
+    return 80
+}
+
+# Shortens a name to $Width characters, with "..." at the end when it is longer.
+function Limit-Name([string]$Name, [int]$Width) {
+    if ($Name.Length -le $Width) { return $Name }
+    if ($Width -le 3) { return $Name.Substring(0, $Width) }
+    return $Name.Substring(0, $Width - 3) + '...'
+}
+
+# Prints the entries numbered 1..n in columns (top to bottom, then left to right, like ls), no paging.
+# As many columns as fit while every name keeps its full length, or at least $MinNameWidth characters;
+# longer names end with "...". The last column never touches the right edge (no auto-wrap).
+function Write-Columns($Items) {
+    $n = $Items.Count
+    if ($n -eq 0) { return }
+    $width = Get-TermWidth
+    $numW = "$n".Length
+    $gap = 2
+    $longest = ($Items | ForEach-Object { $_.Name.Length } | Measure-Object -Maximum).Maximum
+    $want = [Math]::Min($longest, $MinNameWidth)
+    $cols = 1
+    for ($c = $n; $c -ge 1; $c--) {
+        $cellW = [Math]::Floor(($width - 1 - $gap * ($c - 1)) / $c)
+        if ($cellW - $numW - 1 -ge $want) { $cols = $c; break }
+    }
+    $rows = [Math]::Ceiling($n / $cols)
+    $cols = [Math]::Ceiling($n / $rows)                     # drop empty trailing columns
+    $cellW = [Math]::Floor(($width - 1 - $gap * ($cols - 1)) / $cols)
+    $nameW = [Math]::Max(1, [Math]::Min($cellW - $numW - 1, $longest))
+    for ($r = 0; $r -lt $rows; $r++) {
+        for ($c = 0; $c -lt $cols; $c++) {
+            $i = $c * $rows + $r
+            if ($i -ge $n) { break }
+            $last = ($c -eq $cols - 1) -or (($c + 1) * $rows + $r -ge $n)
+            Write-Host ("{0,$numW} " -f ($i + 1)) -ForegroundColor DarkCyan -NoNewline
+            $name = Limit-Name $Items[$i].Name $nameW
+            if (-not $last) { $name = $name.PadRight($nameW + $gap) }
+            Write-Host $name -ForegroundColor Cyan -NoNewline
+        }
+        Write-Host ''
+    }
+}
+
 # Directory browser: start at PROJECTS_ROOT, walk down any depth, pick with Enter.
 function Select-ProjectDir([string]$Start) {
     $cur = if ($Start -and (Test-Path -LiteralPath $Start -PathType Container)) { $Start } else { $HOME }
-    $filter = ''; $page = 0
+    $filter = ''
     $last = if (Test-Path $lastDirFile) { (Get-Content $lastDirFile -Raw).Trim() } else { '' }
     while ($true) {
         $all = @(Get-ChildItem -LiteralPath $cur -Directory -ErrorAction SilentlyContinue |
             Where-Object { -not $_.Name.StartsWith('.') } | Sort-Object Name)
         $list = if ($filter) { @($all | Where-Object { $_.Name -like "*$filter*" }) } else { $all }
-        if ($filter -and $list.Count -eq 1) { $cur = $list[0].FullName; $filter = ''; $page = 0; continue }
-        $pages = [Math]::Max(1, [Math]::Ceiling($list.Count / $PageSize))
-        if ($page -ge $pages) { $page = $pages - 1 }
+        if ($filter -and $list.Count -eq 1) { $cur = $list[0].FullName; $filter = ''; continue }
         Clear-Host
-        Write-Host $cur -ForegroundColor Yellow
+        Write-Host (Limit-Name $cur ((Get-TermWidth) - 1)) -ForegroundColor Yellow
         if ($filter) { Write-Host "filter: *$filter*  ($($list.Count))" -ForegroundColor DarkYellow }
-        $from = $page * $PageSize
-        $shown = @($list | Select-Object -Skip $from -First $PageSize)
-        for ($i = 0; $i -lt $shown.Count; $i++) { Write-Host ("{0,3}  {1}" -f ($i + 1), $shown[$i].Name) -ForegroundColor Cyan }
+        Write-Columns $list
         if (-not $list) { Write-Host '     (no subdirectories)' -ForegroundColor DarkGray }
-        if ($pages -gt 1) { Write-Host ("     page {0}/{1}  (+ / - )" -f ($page + 1), $pages) -ForegroundColor DarkGray }
         Write-Host ' nr=open  Enter=START HERE  ..=up  text=filter  /=clear' -ForegroundColor DarkGray
         $hint = if ($last) { "  l=last ($last)" } else { '' }
         Write-Host " q=cancel$hint" -ForegroundColor DarkGray
@@ -38,13 +81,11 @@ function Select-ProjectDir([string]$Start) {
         switch -Regex ($in) {
             '^$'      { return $cur }
             '^q$'     { return $null }
-            '^l$'     { if ($last -and (Test-Path -LiteralPath $last)) { $cur = $last; $filter = ''; $page = 0 }; break }
-            '^\.\.$'  { $p = Split-Path $cur -Parent; if ($p) { $cur = $p }; $filter = ''; $page = 0; break }
-            '^/$'     { $filter = ''; $page = 0; break }
-            '^\+$'    { if ($page -lt $pages - 1) { $page++ }; break }
-            '^-$'     { if ($page -gt 0) { $page-- }; break }
-            '^\d+$'   { $n = [int]$in; if ($n -ge 1 -and $n -le $shown.Count) { $cur = $shown[$n - 1].FullName; $filter = ''; $page = 0 }; break }
-            default   { $filter = $in; $page = 0 }
+            '^l$'     { if ($last -and (Test-Path -LiteralPath $last)) { $cur = $last; $filter = '' }; break }
+            '^\.\.$'  { $p = Split-Path $cur -Parent; if ($p) { $cur = $p }; $filter = ''; break }
+            '^/$'     { $filter = ''; break }
+            '^\d+$'   { $n = [int]$in; if ($n -ge 1 -and $n -le $list.Count) { $cur = $list[$n - 1].FullName; $filter = '' }; break }
+            default   { $filter = $in }
         }
     }
 }

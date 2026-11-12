@@ -35,7 +35,7 @@ function global:Import-RemoteAIConfig([string]$LaptopDir) {
         AI_PASSTHRU_ARGS = '-p --print --prompt -v --version -h --help'
         CONSOLE_HOST = ''; CONSOLE_USER = 'root'; CONSOLE_PASSWORD = ''; CONSOLE_SSH_PORT = '22'; CONSOLE_PUBKEY = ''
         CONSOLE_BASE_DIR = '/mnt/sdcard/mustardos_remoteai'; CONSOLE_APP_DIR = '/mnt/sdcard/MUOS/application'
-        BROWSER_PAGE_SIZE = '12'; SESSION_START_TIMEOUT = '20'; PSMUX_NO_WARM = '1'
+        BROWSER_MIN_NAME_WIDTH = '20'; SESSION_START_TIMEOUT = '20'; PSMUX_NO_WARM = '1'
     }
     $cfg = [ordered]@{}
     foreach ($k in $defaults.Keys) { $cfg[$k] = $defaults[$k] }
@@ -71,7 +71,7 @@ function global:Import-RemoteAIConfig([string]$LaptopDir) {
         Tools        = $tools
         PassthruArgs = @("$($cfg.AI_PASSTHRU_ARGS)" -split '\s+' | Where-Object { $_ })
         ProjectsRoot = [Environment]::ExpandEnvironmentVariables($cfg.PROJECTS_ROOT)
-        PageSize     = [Math]::Max(3, [int]$cfg.BROWSER_PAGE_SIZE)
+        MinNameWidth = [Math]::Max(5, [int]$cfg.BROWSER_MIN_NAME_WIDTH)
         StartTimeout = [Math]::Max(5, [int]$cfg.SESSION_START_TIMEOUT)
         TaskName     = 'MustardOS_RemoteAI Start Session'
         LastDirFile  = Join-Path $laptopDir '.last_dir'
